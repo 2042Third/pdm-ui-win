@@ -119,7 +119,8 @@ public:
 	void update_file_label(wxString a, int b, int c);
 	void stc_pswd_focus(wxCommandEvent& event);
 	void stc_usrspc_focus(wxCommandEvent& event);
-	void cMainOnFile(wxUpdateUIEvent &event);
+    void cMainOnFile(wxUpdateUIEvent& event);
+    void write_log(const char* a);
   wxString extend_off(wxString a);
   char* get_usrspc(size_t& a);
 	// Decrypted tree
@@ -128,6 +129,7 @@ private:
   char* data_get(size_t a){
     if(data_alloc){
       delete[] data;
+      write_log("[data_get] data cleared");
     }
     data_alloc = 1;
     return new char[a];
@@ -135,6 +137,7 @@ private:
   char* outstr_get(size_t a){
     if(outstr_alloc){
       delete[] outstr;
+      write_log("[outstr_get] outstr cleared");
     }
     outstr_alloc = 1;
     return new char[a];
@@ -154,7 +157,7 @@ private:
                       wxTR_HAS_VARIABLE_ROW_HEIGHT |
                       #endif
                       wxTR_EDIT_LABELS;
-	wxString fileText = _T("请将需要加密的文件拖入此窗口");
+	wxString fileText = _T("Drag files into this box");
 	// void OnDropFiles(wxDropFilesEvent& event);
 	void maintain_theme();
     Tree_Ctrl::DnDFile *d_target;

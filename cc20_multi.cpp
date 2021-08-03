@@ -436,7 +436,7 @@ void Cc20::endicha(uint8_t * a, uint32_t * b) {
  * @param nonce the nonce of this encryption
  * 
  * */
-void cmd_enc(uint8_t* buf, size_t input_length, uint8_t* outstr , string text_key){
+char* cmd_enc(uint8_t* buf, size_t input_length, uint8_t* outstr , string text_key){
   // cout<<infile_name<<","<<oufile_name<<","<<text_nonce<<"\n"<<endl;
   Bytes cur;
   init_byte_rand_cc20(cur,12);
@@ -466,13 +466,12 @@ void cmd_enc(uint8_t* buf, size_t input_length, uint8_t* outstr , string text_ke
   if(DE){
     std::cout<<"Decryption message received "<<std::endl;
     cry_obj.rd_file_encr(buf,outstr, input_length);
-
-//      if (ENABLE_SHA3_OUTPUT) cout <<"SHA3: \""<<hashing.getHash()<<"\""<<endl;
+    return hashing.getHash().data();
   }
   else {
     std::cout<<"Encryption message received "<<std::endl;
     cry_obj.rd_file_encr(buf, outstr, input_length);
-//      if (ENABLE_SHA3_OUTPUT) cout <<"SHA3: \""<<hashing.getHash()<<"\""<<endl;
+    return hashing.getHash().data();
   }
   auto end = std::chrono::high_resolution_clock::now();
   auto dur = end - start;

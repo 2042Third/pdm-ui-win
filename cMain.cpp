@@ -110,7 +110,7 @@ cMain::cMain(wxWindow* parent,
 	usr_enter = new wxTextCtrl(panel,wxEVT_TEXT_ENTER, wxEmptyString,
                              wxDefaultPosition,  wxDefaultSize,
                              wxTE_PASSWORD,  wxDefaultValidator,
-                             "密码");
+                             "password");
 	passwd_sizer->Add(pswd_text, 1,wxALL | wxEXPAND, 0);
 	passwd_sizer->Add(usr_enter,1,wxALL | wxEXPAND,0);
 	pane_files_sizer->Add(txt,-1, wxEXPAND, 1);
@@ -128,7 +128,7 @@ cMain::cMain(wxWindow* parent,
 	pane_files->SetDropTarget(d_target);
 	maintain_theme();
 
-	pane_files->WriteText(_T("请将需要加密的文件拖入此窗口\n"));
+	pane_files->WriteText(_T("Drag files into this box\n"));
 	// Panel Text
 	tree_ctrl->set_d_target(d_target);
 	menu_bar->Append(menu_pdm, wxT("&PDM"));
@@ -236,7 +236,7 @@ void cMain::open_file(wxString infile) {
 }
 
 void cMain::stc_save_as(wxCommandEvent& event){
-  std::printf("[stc_save_as] Starting operation\n");
+  write_log("[stc_save_as] Starting operation\n");
   size_t file_len=0;
   CurrentDocPath="";
   CurrentFileName="New_File";
@@ -309,7 +309,7 @@ void cMain::stc_new(wxCommandEvent& event) {
 
 void cMain::on_close(wxCloseEvent& event){
 	if (event.CanVeto()) {
-	    int answer = wxMessageBox(_T("退出!"), _T("请确认加密文件已保存"),wxYES_NO| wxCANCEL,panel);
+	    int answer = wxMessageBox(_T("Exit!"), _T("Make sure the files are saved"),wxYES_NO| wxCANCEL,panel);
 		this->SetFocus();
 	    if (answer != wxYES) {
 			event.Veto();
@@ -345,7 +345,7 @@ void cMain::cMainOnFile(wxUpdateUIEvent & event) {
 }
 
 void cMain::stc_open(wxCommandEvent& WXUNUSED(event)) {
-  std::printf("[stc_open] Starting operation\n");
+  write_log("[stc_open] Starting operation\n");
 	auto* OpenDialog = new wxFileDialog(
 		this, _("Choose a file to open"), wxEmptyString, wxEmptyString,
 		_("*"),
@@ -384,21 +384,21 @@ void cMain::stc_usrspc_focus(wxCommandEvent& event)  {
 
 char* cMain::get_usrspc(size_t& a){
   wxString bff = pane_usrspc->GetValue();
-  std::string bff_str=(char*)bff.mb_str().data();
-  data = data_get(bff_str.size()+2);
-  outstr = outstr_get(bff.size()+14);
+  data = data_get(bff.size() + 2);
+  outstr = outstr_get(bff.size() + 14);
+  char* bff_str=(char*)bff.mb_str().data();
   for(size_t i=0; i<bff.size();i++){
-    data[i]=bff_str.data()[i];
+    data[i]=bff_str[i];
   }
   data[bff.size()]='\n';
   data[bff.size()+1]='\0';
-  std::printf("Content %zu: \"%s\"\n",bff_str.size(),data);
-  a = bff_str.size()+1;
+  std::printf("Content %zu: \"%s\"\n",bff.size(),data);
+  a = bff.size()+1;
   return data;
 }
 
 void cMain::stc_save(wxCommandEvent& event) {
-  std::printf("[stc_save] Starting operation\n");
+  write_log("[stc_save] Starting operation\n");
   size_t inp_len=0;
 
   get_usrspc(inp_len);
@@ -414,8 +414,8 @@ void cMain::stc_save(wxCommandEvent& event) {
   std::cout<<"Size save file: "<<CurrentFileSize<<std::endl;
 
   DE = 0;
-  cmd_enc((uint8_t*)data,(size_t)inp_len,(uint8_t*)outstr,((std::string)pswd_data));
-
+  char * hash_t = cmd_enc((uint8_t*)data,(size_t)inp_len,(uint8_t*)outstr,((std::string)pswd_data));
+  write_log(hash_t);
   if (!CurrentFileName.empty()){
     std::cout << "doc dir: " << CurrentDocPath << std::endl;
 
@@ -481,7 +481,10 @@ int cMain::check_extend(wxString a){
   }
   return 0;
 }
-
+void cMain::write_log(const char* a) {
+    tree_ctrl->d_target->m_pOwner->WriteText(a);
+    tree_ctrl->d_target->m_pOwner->WriteText("\n");
+}   
 wxString cMain::extend_off(wxString a){
   return a.Mid(0, a.size() - 4);
 }
